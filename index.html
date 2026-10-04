@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Apuração em tempo real das Eleições 2026: presidente por estado e Pernambuco, direto dos dados do TSE.">
+  <title>Apuração 2026 ao vivo</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="src/app.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Apuração 2026 · 1º turno</h1>
+    <span id="status" class="sub">Carregando…</span>
+  </header>
+
+  <div class="grid two">
+    <section class="card">
+      <h2>Quem lidera para presidente em cada estado</h2>
+      <p class="sub">Passe o mouse sobre um estado para ver o detalhe.</p>
+      <div id="legend" class="legend"></div>
+      <svg id="map" viewBox="0 0 380 392" role="img" aria-label="Mapa do Brasil colorido pelo candidato a presidente que lidera em cada estado"></svg>
+    </section>
+    <section id="national" class="card">
+      <h2>Presidente · Brasil</h2>
+      <p class="sub"></p>
+      <div id="tiles" class="tiles"></div>
+      <div class="ranking"></div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Presidente por estado</h2>
+    <div class="scroll"><table id="state-table"></table></div>
+  </section>
+
+  <h2 class="section">Pernambuco</h2>
+  <div class="grid three">
+    <section id="home-president" class="card">
+      <h2>Presidente</h2>
+      <p class="sub"></p>
+      <div class="ranking"></div>
+    </section>
+    <section id="home-governor" class="card">
+      <h2>Governador</h2>
+      <p class="sub"></p>
+      <div class="ranking"></div>
+    </section>
+    <section id="home-senator" class="card">
+      <h2>Senador · 2 vagas</h2>
+      <p class="sub"></p>
+      <div class="ranking"></div>
+    </section>
+  </div>
+
+  <footer class="sub">
+    Fonte: <a href="https://resultados.tse.jus.br">Tribunal Superior Eleitoral</a> (arquivos públicos de divulgação) ·
+    malha estadual do IBGE. Resultados parciais até o fim da totalização.
+  </footer>
+  <div id="tooltip" hidden></div>
+</body>
+</html>
