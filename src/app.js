@@ -25,6 +25,8 @@ class Dashboard {
     await this.map.load('data/states.geojson');
     await this.refresh();
     setInterval(() => this.refresh(), REFRESH_MS);
+    // Browsers throttle timers in background tabs, so catch up as soon as the tab is shown again.
+    document.addEventListener('visibilitychange', () => document.hidden || this.refresh());
   }
 
   async refresh() {
@@ -55,7 +57,7 @@ class Dashboard {
   #renderHeader(national) {
     const now = new Date().toLocaleTimeString('pt-BR');
     this.status.textContent =
-      `Dados do TSE de ${national.updatedAt} · consultado às ${now} · atualiza a cada ${REFRESH_MS / 1000} s` +
+      `Última totalização do TSE: ${national.updatedAt} · página atualizada às ${now} (a cada ${REFRESH_MS / 1000} s)` +
       (national.isFinal ? ' · totalização encerrada' : '');
     this.tiles.innerHTML = [
       [`${national.sectionsPct}%`, 'seções totalizadas'],
