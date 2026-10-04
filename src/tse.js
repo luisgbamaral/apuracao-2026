@@ -24,8 +24,10 @@ export class Tally {
       .sort((a, b) => b.votes - a.votes);
     this.updatedAt = `${json.dt} ${json.ht}`.trim();
     this.isFinal = json.tf === 's';
-    // "md" (single-seat races only): "e" once the leader is mathematically elected, "s" for a runoff.
+    // "md" (races with a runoff only): "e" once the leader is mathematically elected, "s" for a runoff.
+    this.hasRunoff = json.md != null;
     this.isMathematicallyDecided = json.md === 'e';
+    this.remainingVoters = e.esnt === undefined ? Infinity : Number(e.esnt); // in sections not yet counted
     this.sectionsPct = s.pst || '0,00';
     this.validVotes = Number(v.vv) || 0; // vvc would also count votes annulled sub judice
     this.blankPct = v.pvb || '0,00';
@@ -43,14 +45,24 @@ export class Tally {
     return this.leader && this.candidates[1].votes > 0 ? this.candidates[1] : null;
   }
 
-  /**
-   * Candidates the TSE has confirmed as elected: by status once it is published, and before
-   * that the leader of a race the TSE flags as mathematically decided.
-   */
+  /** Candidates already elected: by TSE status once published, mathematically before that. */
   get elected() {
     const confirmed = this.candidates.filter(c => c.elected);
-    if (confirmed.length || !this.isMathematicallyDecided || !this.leader) return confirmed;
-    return [{ ...this.leader, note: 'Matematicamente eleito' }];
+    if (confirmed.length) return confirmed;
+    return this.#mathematicallyElected().map(c => ({ ...c, note: 'Matematicamente eleito' }));
+  }
+
+  /**
+   * Winners that the uncounted votes can no longer change. Races with a runoff: the leader, when
+   * the TSE flags the race as decided. Plurality races (senator): whoever stays ahead of the first
+   * candidate outside the seats even if every remaining voter chose that candidate.
+   */
+  #mathematicallyElected() {
+    if (this.isProportional) return [];
+    if (this.hasRunoff) return this.isMathematicallyDecided && this.leader ? [this.leader] : [];
+    const chaser = this.candidates[this.seats]?.votes ?? 0;
+    return this.candidates.slice(0, this.seats)
+      .filter(c => c.valid && c.votes > chaser + this.remainingVoters);
   }
 
   /**
@@ -64,11 +76,16 @@ export class Tally {
     return this.groupSeats.flatMap((seats, group) => eligible.filter(c => c.group === group).slice(0, seats));
   }
 
-  /** The confirmed winners; while there are none and a preview is wanted, the projected ones. */
+  /**
+   * The elected candidates, flagged as decided. With a preview, the seats still open go to the
+   * projected winners until the TSE publishes the final statuses.
+   */
   winners(withPreview) {
-    const confirmed = this.elected.map(c => ({ ...c, official: true }));
-    if (confirmed.length || !withPreview) return confirmed;
-    return this.projected.map(c => ({ ...c, official: false, note: 'Prévia' }));
+    const decided = this.elected.map(c => ({ ...c, decided: true }));
+    if (!withPreview || this.candidates.some(c => c.elected)) return decided;
+    const taken = new Set(decided.map(c => c.number));
+    const preview = this.projected.filter(c => !taken.has(c.number));
+    return [...decided, ...preview.map(c => ({ ...c, decided: false, note: 'Prévia' }))];
   }
 
   /** Candidates currently holding one of the seats in dispute. */

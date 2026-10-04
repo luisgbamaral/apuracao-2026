@@ -32,7 +32,7 @@ Design notes:
 
 - **Colour follows the candidate, not the rank.** The three national leaders seen on the first visit keep their colour, so a state never repaints because the national order flipped. Three is the most hues that stay distinguishable on a map, including for colour-blind readers; any other candidate leading a state is shown in grey and named in the tooltip and the table.
 - **The map is plain SVG.** State boundaries are projected with an equirectangular projection, so no mapping library is needed.
-- **Only confirmed winners count as elected.** A candidate is confirmed when the TSE publishes an "Eleito" status, or flags a single-seat race as mathematically decided. The file's `e` flag is not used, because it is also set for candidates going to a runoff.
+- **A seat is decided only when it cannot change.** That is when the TSE publishes an "Eleito" status, when it flags a governor race as mathematically decided, or, for senators, when a candidate stays ahead of the first one outside the seats even if every voter in the uncounted sections chose that rival. The file's `e` flag is not used, because it is also set for candidates going to a runoff.
 - **The preview reuses the TSE's own arithmetic.** For senators it is the most voted candidates of each state. For deputies, each state file already carries the seats each party or federation holds so far (the TSE's partial run of the quotient and remainder rules), so the page only picks the most voted candidates of each group. On finished 2024 council races this rule reproduces the official winners exactly.
 - **A missing file never blanks the page.** Each request fails on its own and the affected panel says so.
 

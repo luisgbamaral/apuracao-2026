@@ -53,7 +53,7 @@ class PartyPie {
   }
 }
 
-/** Winners of one office across all states (confirmed, or previewed until then), split by party. */
+/** Winners of one office across all states (decided, or previewed until then), split by party. */
 class ElectedPage extends LivePage {
   constructor(page) {
     super(REFRESH_MS);
@@ -75,12 +75,12 @@ class ElectedPage extends LivePage {
     const seats = available.reduce((sum, [, tally]) => sum + tally.seats, 0);
     const winners = available.flatMap(([uf, tally]) =>
       tally.winners(this.page.preview).map(c => ({ ...c, state: STATES[uf].name })));
-    const confirmed = winners.filter(c => c.official).length;
-    const previewed = winners.length - confirmed;
+    const decided = winners.filter(c => c.decided).length;
+    const previewed = winners.length - decided;
     const missing = tallies.length - available.length;
 
     $('status').textContent =
-      `${confirmed} de ${seats} vagas com eleito confirmado pelo TSE` +
+      `${decided} de ${seats} vagas definidas` +
       (previewed ? ` · ${previewed} em prévia` : '') + ` · ${this.refreshNote}` +
       (missing ? ` · ${missing} estado(s) sem dados no momento` : '');
     $('empty').hidden = winners.length > 0;
@@ -90,7 +90,7 @@ class ElectedPage extends LivePage {
 
     const slices = this.#partySlices(winners);
     if (seats > winners.length) {
-      slices.push({ party: PENDING, count: seats - winners.length, confirmed: 0, color: PENDING_COLOR });
+      slices.push({ party: PENDING, count: seats - winners.length, decided: 0, color: PENDING_COLOR });
     }
     this.pie.render(slices);
     this.#renderParties(slices, seats);
@@ -101,10 +101,10 @@ class ElectedPage extends LivePage {
   /** Seats per party, largest first. */
   #partySlices(winners) {
     const parties = new Map();
-    for (const { party, official } of winners) {
-      const slice = parties.get(party) ?? { party, count: 0, confirmed: 0, color: this.palette.colorOf(party) };
+    for (const { party, decided } of winners) {
+      const slice = parties.get(party) ?? { party, count: 0, decided: 0, color: this.palette.colorOf(party) };
       slice.count += 1;
-      slice.confirmed += official ? 1 : 0;
+      slice.decided += decided ? 1 : 0;
       parties.set(party, slice);
     }
     return [...parties.values()].sort((a, b) => b.count - a.count || a.party.localeCompare(b.party));
@@ -112,17 +112,17 @@ class ElectedPage extends LivePage {
 
   #renderParties(slices, seats) {
     const share = count => (100 * count / seats).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-    const split = this.page.preview; // confirmed and previewed seats in separate columns
+    const split = this.page.preview; // decided and previewed seats in separate columns
     const sum = key => slices.reduce((total, s) => total + (s.party === PENDING ? 0 : s[key]), 0);
     $('parties').innerHTML =
       '<thead><tr><th>Partido</th>' +
-      (split ? '<th class="num">Confirmadas</th><th class="num">Prévia</th>' : '') +
+      (split ? '<th class="num">Definidas</th><th class="num">Prévia</th>' : '') +
       '<th class="num">Vagas</th><th class="num">% das vagas</th></tr></thead><tbody>' +
       slices.map(s => `<tr><td>${swatch(s.color)}${esc(s.party)}</td>` +
-        (split ? `<td class="num">${s.confirmed}</td><td class="num">${s.party === PENDING ? 0 : s.count - s.confirmed}</td>` : '') +
+        (split ? `<td class="num">${s.decided}</td><td class="num">${s.party === PENDING ? 0 : s.count - s.decided}</td>` : '') +
         `<td class="num">${s.count}</td><td class="num">${share(s.count)}%</td></tr>`).join('') +
       '</tbody><tfoot><tr><th>Total em disputa</th>' +
-      (split ? `<th class="num">${sum('confirmed')}</th><th class="num">${sum('count') - sum('confirmed')}</th>` : '') +
+      (split ? `<th class="num">${sum('decided')}</th><th class="num">${sum('count') - sum('decided')}</th>` : '') +
       `<th class="num">${seats}</th><th class="num">100,0%</th></tr></tfoot>`;
   }
 
