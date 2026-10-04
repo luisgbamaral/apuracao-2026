@@ -4,11 +4,12 @@ export const TSE_BASE = 'https://resultados.tse.jus.br/oficial/ele2026';
 export const ELECTION = { federal: '6257', state: '6259' };
 export const OFFICE = { president: '0001', governor: '0003', senator: '0005', federalDeputy: '0006' };
 
-// Pages of confirmed winners, keyed by the "cargo" query parameter of eleitos.html.
+// Pages of winners, keyed by the "cargo" query parameter of eleitos.html. With "preview", states
+// the TSE has not confirmed yet show who would win if the count ended now.
 export const ELECTED_PAGES = {
-  governador: { office: OFFICE.governor, title: 'Governadores eleitos', listNames: true },
-  senador: { office: OFFICE.senator, title: 'Senadores eleitos', listNames: true },
-  'deputado-federal': { office: OFFICE.federalDeputy, title: 'Deputados federais eleitos', listNames: false },
+  governador: { office: OFFICE.governor, title: 'Governadores eleitos', listNames: true, preview: false },
+  senador: { office: OFFICE.senator, title: 'Senadores', listNames: true, preview: true },
+  'deputado-federal': { office: OFFICE.federalDeputy, title: 'Deputados federais', listNames: false, preview: true },
 };
 
 export const HOME_STATE = 'pe';

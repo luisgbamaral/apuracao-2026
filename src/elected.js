@@ -53,7 +53,7 @@ class PartyPie {
   }
 }
 
-/** Winners confirmed by the TSE for one office, across all states, with the split by party. */
+/** Winners of one office across all states (confirmed, or previewed until then), split by party. */
 class ElectedPage extends LivePage {
   constructor(page) {
     super(REFRESH_MS);
@@ -73,47 +73,64 @@ class ElectedPage extends LivePage {
   render(tallies) {
     const available = tallies.filter(([, tally]) => tally);
     const seats = available.reduce((sum, [, tally]) => sum + tally.seats, 0);
-    const elected = available.flatMap(([uf, tally]) => tally.elected.map(c => ({ ...c, state: STATES[uf].name })));
+    const winners = available.flatMap(([uf, tally]) =>
+      tally.winners(this.page.preview).map(c => ({ ...c, state: STATES[uf].name })));
+    const confirmed = winners.filter(c => c.official).length;
+    const previewed = winners.length - confirmed;
     const missing = tallies.length - available.length;
 
     $('status').textContent =
-      `${elected.length} de ${seats} vagas com eleito confirmado pelo TSE · ${this.refreshNote}` +
+      `${confirmed} de ${seats} vagas com eleito confirmado pelo TSE` +
+      (previewed ? ` · ${previewed} em prévia` : '') + ` · ${this.refreshNote}` +
       (missing ? ` · ${missing} estado(s) sem dados no momento` : '');
-    $('empty').hidden = elected.length > 0;
-    $('results').hidden = elected.length === 0;
-    if (!elected.length) return;
+    $('empty').hidden = winners.length > 0;
+    $('results').hidden = winners.length === 0;
+    $('preview-note').hidden = previewed === 0;
+    if (!winners.length) return;
 
-    const slices = this.#partySlices(elected);
-    if (seats > elected.length) slices.push({ party: PENDING, count: seats - elected.length, color: PENDING_COLOR });
+    const slices = this.#partySlices(winners);
+    if (seats > winners.length) {
+      slices.push({ party: PENDING, count: seats - winners.length, confirmed: 0, color: PENDING_COLOR });
+    }
     this.pie.render(slices);
     this.#renderParties(slices, seats);
     $('names').hidden = !this.page.listNames;
-    if (this.page.listNames) this.#renderList(elected);
+    if (this.page.listNames) this.#renderList(winners);
   }
 
   /** Seats per party, largest first. */
-  #partySlices(elected) {
-    const counts = new Map();
-    for (const { party } of elected) counts.set(party, (counts.get(party) ?? 0) + 1);
-    return [...counts]
-      .sort(([a, x], [b, y]) => y - x || a.localeCompare(b))
-      .map(([party, count]) => ({ party, count, color: this.palette.colorOf(party) }));
+  #partySlices(winners) {
+    const parties = new Map();
+    for (const { party, official } of winners) {
+      const slice = parties.get(party) ?? { party, count: 0, confirmed: 0, color: this.palette.colorOf(party) };
+      slice.count += 1;
+      slice.confirmed += official ? 1 : 0;
+      parties.set(party, slice);
+    }
+    return [...parties.values()].sort((a, b) => b.count - a.count || a.party.localeCompare(b.party));
   }
 
   #renderParties(slices, seats) {
     const share = count => (100 * count / seats).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const split = this.page.preview; // confirmed and previewed seats in separate columns
+    const sum = key => slices.reduce((total, s) => total + (s.party === PENDING ? 0 : s[key]), 0);
     $('parties').innerHTML =
-      '<thead><tr><th>Partido</th><th class="num">Vagas</th><th class="num">% das vagas</th></tr></thead><tbody>' +
-      slices.map(s => `<tr><td>${swatch(s.color)}${esc(s.party)}</td><td class="num">${s.count}</td>` +
-        `<td class="num">${share(s.count)}%</td></tr>`).join('') +
-      `</tbody><tfoot><tr><th>Total em disputa</th><th class="num">${seats}</th><th class="num">100,0%</th></tr></tfoot>`;
+      '<thead><tr><th>Partido</th>' +
+      (split ? '<th class="num">Confirmadas</th><th class="num">Prévia</th>' : '') +
+      '<th class="num">Vagas</th><th class="num">% das vagas</th></tr></thead><tbody>' +
+      slices.map(s => `<tr><td>${swatch(s.color)}${esc(s.party)}</td>` +
+        (split ? `<td class="num">${s.confirmed}</td><td class="num">${s.party === PENDING ? 0 : s.count - s.confirmed}</td>` : '') +
+        `<td class="num">${s.count}</td><td class="num">${share(s.count)}%</td></tr>`).join('') +
+      '</tbody><tfoot><tr><th>Total em disputa</th>' +
+      (split ? `<th class="num">${sum('confirmed')}</th><th class="num">${sum('count') - sum('confirmed')}</th>` : '') +
+      `<th class="num">${seats}</th><th class="num">100,0%</th></tr></tfoot>`;
   }
 
-  #renderList(elected) {
-    const rows = [...elected].sort((a, b) => a.state.localeCompare(b.state) || b.votes - a.votes);
+  #renderList(winners) {
+    const rows = [...winners].sort((a, b) => a.state.localeCompare(b.state) || b.votes - a.votes);
     $('list').innerHTML =
       '<thead><tr><th>Estado</th><th>Nome</th><th>Partido</th><th class="num">Votos</th>' +
-      '<th class="num">% válidos</th><th>Situação no TSE</th></tr></thead><tbody>' +
+      '<th class="num">% válidos</th><th>Situação</th></tr></thead><tbody>' +
       rows.map(c => `<tr><td>${c.state}</td><td>${esc(c.name)}</td><td>${swatch(this.palette.colorOf(c.party))}${esc(c.party)}</td>` +
         `<td class="num">${formatInt(c.votes)}</td><td class="num">${c.pct}%</td><td>${esc(c.note)}</td></tr>`).join('') +
       '</tbody>';
