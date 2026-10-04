@@ -14,10 +14,14 @@ export class Tally {
         votes: Number(c.vap) || 0,
         pct: c.pvap || '0,00',
         note: c.st || (c.dvt && c.dvt !== 'Válido' ? c.dvt : ''),
+        // The "e" flag is also set for candidates going to a runoff, so only the status text counts.
+        elected: (c.st ?? '').startsWith('Eleito'),
       })))
       .sort((a, b) => b.votes - a.votes);
     this.updatedAt = `${json.dt} ${json.ht}`.trim();
     this.isFinal = json.tf === 's';
+    // "md" (single-seat races only): "e" once the leader is mathematically elected, "s" for a runoff.
+    this.isMathematicallyDecided = json.md === 'e';
     this.sectionsPct = s.pst || '0,00';
     this.validVotes = Number(v.vv) || 0; // vvc would also count votes annulled sub judice
     this.blankPct = v.pvb || '0,00';
@@ -33,6 +37,16 @@ export class Tally {
 
   get runnerUp() {
     return this.leader && this.candidates[1].votes > 0 ? this.candidates[1] : null;
+  }
+
+  /**
+   * Candidates the TSE has confirmed as elected: by status once it is published, and before
+   * that the leader of a race the TSE flags as mathematically decided.
+   */
+  get elected() {
+    const confirmed = this.candidates.filter(c => c.elected);
+    if (confirmed.length || !this.isMathematicallyDecided || !this.leader) return confirmed;
+    return [{ ...this.leader, note: 'Matematicamente eleito' }];
   }
 
   /** Candidates currently holding one of the seats in dispute. */

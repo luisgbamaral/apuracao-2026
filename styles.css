@@ -55,6 +55,18 @@ header {
   margin-bottom: 12px;
 }
 
+nav { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-bottom: 14px; }
+nav a {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--ink-2);
+  font-size: 13px;
+  text-decoration: none;
+}
+nav a:hover { color: var(--ink); }
+nav a[aria-current] { background: var(--ink); border-color: var(--ink); color: var(--page); }
+
 footer { margin-top: 16px; }
 footer a { color: inherit; }
 
@@ -105,7 +117,12 @@ footer a { color: inherit; }
 #map { display: block; width: 100%; height: auto; }
 #map path { stroke: var(--surface); stroke-width: 1; cursor: pointer; }
 #map path:hover { stroke: var(--ink); stroke-width: 1.5; }
-#map text {
+
+/* Party pie */
+.pie { display: block; width: 100%; max-width: 420px; height: auto; margin: 10px auto 0; }
+.pie path { stroke: var(--surface); stroke-width: 1; stroke-linejoin: round; }
+
+#map text, .pie text {
   fill: var(--ink);
   stroke: var(--surface);
   stroke-width: 2px;
@@ -163,4 +180,5 @@ table { width: 100%; border-collapse: collapse; font-size: 12px; font-variant-nu
 th { color: var(--ink-2); font-weight: 600; text-align: left; }
 th, td { padding: 4px 6px; border-top: 1px solid var(--hairline); white-space: nowrap; }
 thead th { border-top: 0; }
+[hidden] { display: none; }
 .num { text-align: right; }

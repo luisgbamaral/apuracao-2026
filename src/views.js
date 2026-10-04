@@ -2,9 +2,9 @@ import { STATES } from './config.js';
 import { CandidatePalette } from './palette.js';
 
 const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-const esc = text => String(text).replace(/[&<>"']/g, ch => ESCAPES[ch]);
+export const esc = text => String(text).replace(/[&<>"']/g, ch => ESCAPES[ch]);
 const toNumber = pct => parseFloat(pct.replace(',', '.'));
-const swatch = color => `<i class="swatch" style="background:${color}"></i>`;
+export const swatch = color => `<i class="swatch" style="background:${color}"></i>`;
 
 export const formatInt = n => n.toLocaleString('pt-BR');
 

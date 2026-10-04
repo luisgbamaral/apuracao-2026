@@ -1,3 +1,37 @@
+/** Maps parties to colours: a fixed colour for the largest parties, spare ones for the rest. */
+export class PartyPalette {
+  static OTHER = 'var(--other)';
+  static FIXED = {
+    PT: '#d7263d',
+    PL: '#2a78d6',
+    UNIÃO: '#1baf7a',
+    PP: '#0e7c86',
+    PSD: '#eb6834',
+    MDB: '#008300',
+    REPUBLICANOS: '#6f5fd0',
+    PSB: '#eda100',
+    PDT: '#e87ba4',
+    PSDB: '#8c6d3f',
+    PODE: '#7a9a01',
+    PSOL: '#b04ac2',
+  };
+  static SPARE = [
+    '#5d6d7e', '#c08552', '#3ec1d3', '#a3586a', '#4f7f3a', '#c2a83e', '#7d7fbf', '#d99a7c', '#2f6f73',
+    '#9c6b98', '#6b8e9f', '#b5651d', '#4b9b8f', '#8a8f2a', '#c76f8e', '#3d5a80', '#a08060', '#6a4c93',
+  ];
+
+  #assigned = new Map();
+
+  /** A party keeps its colour for the whole visit, whatever its rank becomes. */
+  colorOf(party) {
+    if (PartyPalette.FIXED[party]) return PartyPalette.FIXED[party];
+    if (!this.#assigned.has(party)) {
+      this.#assigned.set(party, PartyPalette.SPARE[this.#assigned.size] ?? PartyPalette.OTHER);
+    }
+    return this.#assigned.get(party);
+  }
+}
+
 /**
  * Maps presidential candidates to colours. Colour follows the candidate, not the rank:
  * the national leaders seen on the first visit keep their slot for good, so a state

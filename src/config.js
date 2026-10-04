@@ -2,7 +2,14 @@ export const TSE_BASE = 'https://resultados.tse.jus.br/oficial/ele2026';
 
 // Codes published by the TSE in oficial/comum/config/ele-c.json.
 export const ELECTION = { federal: '6257', state: '6259' };
-export const OFFICE = { president: '0001', governor: '0003', senator: '0005' };
+export const OFFICE = { president: '0001', governor: '0003', senator: '0005', federalDeputy: '0006' };
+
+// Pages of confirmed winners, keyed by the "cargo" query parameter of eleitos.html.
+export const ELECTED_PAGES = {
+  governador: { office: OFFICE.governor, title: 'Governadores eleitos', listNames: true },
+  senador: { office: OFFICE.senator, title: 'Senadores eleitos', listNames: true },
+  'deputado-federal': { office: OFFICE.federalDeputy, title: 'Deputados federais eleitos', listNames: false },
+};
 
 export const HOME_STATE = 'pe';
 export const REFRESH_MS = 60_000; // the TSE serves each file with max-age=55

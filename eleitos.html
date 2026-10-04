@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Eleitos confirmados pelo TSE nas Eleições 2026, por estado e por partido, em tempo real.">
+  <title>Eleitos · Apuração 2026</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="src/elected.js"></script>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Apuração</a>
+    <a href="eleitos.html?cargo=governador">Governadores</a>
+    <a href="eleitos.html?cargo=senador">Senadores</a>
+    <a href="eleitos.html?cargo=deputado-federal">Deputados federais</a>
+  </nav>
+  <header>
+    <h1 id="title">Eleitos</h1>
+    <span id="status" class="sub">Carregando…</span>
+  </header>
+
+  <section id="empty" class="card" hidden>
+    <h2>Nenhum eleito confirmado ainda</h2>
+    <p class="sub">
+      Esta página mostra apenas quem o TSE já confirmou como eleito e se atualiza sozinha
+      quando houver confirmações.
+    </p>
+  </section>
+
+  <div id="results" hidden>
+    <div class="grid two">
+      <section class="card">
+        <h2>Vagas por partido</h2>
+        <p class="sub">Proporção sobre o total de vagas em disputa nesta eleição.</p>
+        <svg id="pie" class="pie" viewBox="0 0 200 200" role="img" aria-label="Gráfico de pizza das vagas por partido"></svg>
+      </section>
+      <section class="card">
+        <h2>Partidos</h2>
+        <div class="scroll"><table id="parties"></table></div>
+      </section>
+    </div>
+    <section id="names" class="card">
+      <h2>Lista de eleitos</h2>
+      <div class="scroll"><table id="list"></table></div>
+    </section>
+  </div>
+
+  <footer class="sub">
+    Fonte: <a href="https://resultados.tse.jus.br">Tribunal Superior Eleitoral</a> (arquivos públicos de divulgação).
+    Só aparece quem o TSE já confirmou como eleito.
+  </footer>
+</body>
+</html>
