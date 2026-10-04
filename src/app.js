@@ -29,7 +29,10 @@ class Dashboard {
     document.addEventListener('visibilitychange', () => document.hidden || this.refresh());
   }
 
+  #refreshId = 0;
+
   async refresh() {
+    const refreshId = ++this.#refreshId;
     const ufs = Object.keys(STATES);
     const president = area => this.client.tally(ELECTION.federal, OFFICE.president, area);
     const [national, governor, senator, ...byState] = await Promise.all([
@@ -38,6 +41,7 @@ class Dashboard {
       this.client.tally(ELECTION.state, OFFICE.senator, HOME_STATE),
       ...ufs.map(president),
     ]);
+    if (refreshId !== this.#refreshId) return; // a newer refresh started meanwhile; never paint older data over it
     if (!national) {
       this.status.textContent = 'Não foi possível consultar o TSE. Nova tentativa em instantes.';
       return;

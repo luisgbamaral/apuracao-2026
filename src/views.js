@@ -75,7 +75,7 @@ export class BrazilMap {
       .map(number => national.candidates.find(c => c.number === number))
       .filter(Boolean)
       .map(c => [this.palette.colorOf(c), c.name]);
-    this.legend.innerHTML = [...named, [CandidatePalette.OTHER, 'Outro candidato'], [CandidatePalette.NONE, 'Sem votos apurados']]
+    this.legend.innerHTML = [...named, [CandidatePalette.OTHER, 'Outro candidato'], [CandidatePalette.NONE, 'Sem líder definido']]
       .map(([color, label]) => `<span>${swatch(color)}${esc(label)}</span>`).join('');
   }
 
