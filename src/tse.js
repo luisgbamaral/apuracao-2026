@@ -13,7 +13,7 @@ export class Tally {
         party: party.sg,
         votes: Number(c.vap) || 0,
         pct: c.pvap || '0,00',
-        note: c.st || (c.dvt && c.dvt !== 'Válido' ? c.dvt : ''),
+        note: c.dvt && c.dvt !== 'Válido' ? c.dvt : '', // vote validity only; the outcome (c.st) is not shown
       })))
       .sort((a, b) => b.votes - a.votes);
     this.updatedAt = `${json.dt} ${json.ht}`.trim();
