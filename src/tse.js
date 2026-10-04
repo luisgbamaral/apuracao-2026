@@ -1,3 +1,5 @@
+const RUNOFF_OFFICES = new Set([1, 3]); // president and governor need a majority of the valid votes
+
 /** The count of one office in one area (Brazil or a state), parsed from a TSE result file. */
 export class Tally {
   constructor(json) {
@@ -24,8 +26,10 @@ export class Tally {
       .sort((a, b) => b.votes - a.votes);
     this.updatedAt = `${json.dt} ${json.ht}`.trim();
     this.isFinal = json.tf === 's';
-    // "md" (races with a runoff only): "e" once the leader is mathematically elected, "s" for a runoff.
-    this.hasRunoff = json.md != null;
+    this.hasRunoff = RUNOFF_OFFICES.has(this.source.office);
+    // Once the TSE publishes a status per candidate, those statuses are the result.
+    this.hasStatuses = office.agr.some(group => group.par.some(party => party.cand.some(c => c.st)));
+    // "md" (races with a runoff, while counting): "e" once the leader is mathematically elected.
     this.isMathematicallyDecided = json.md === 'e';
     this.remainingVoters = e.esnt === undefined ? Infinity : Number(e.esnt); // in sections not yet counted
     this.sectionsPct = s.pst || '0,00';
@@ -47,8 +51,7 @@ export class Tally {
 
   /** Candidates already elected: by TSE status once published, mathematically before that. */
   get elected() {
-    const confirmed = this.candidates.filter(c => c.elected);
-    if (confirmed.length) return confirmed;
+    if (this.hasStatuses) return this.candidates.filter(c => c.elected);
     return this.#mathematicallyElected().map(c => ({ ...c, note: 'Matematicamente eleito' }));
   }
 
@@ -82,7 +85,7 @@ export class Tally {
    */
   winners(withPreview) {
     const decided = this.elected.map(c => ({ ...c, decided: true }));
-    if (!withPreview || this.candidates.some(c => c.elected)) return decided;
+    if (!withPreview || this.hasStatuses) return decided;
     const taken = new Set(decided.map(c => c.number));
     const preview = this.projected.filter(c => !taken.has(c.number));
     return [...decided, ...preview.map(c => ({ ...c, decided: false, note: 'Prévia' }))];

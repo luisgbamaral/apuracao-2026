@@ -1,8 +1,8 @@
-import { ELECTION, HOME_STATE, OFFICE, REFRESH_MS, STATES, TSE_BASE } from './config.js?v=6';
-import { LivePage } from './live-page.js?v=6';
-import { CandidatePalette } from './palette.js?v=6';
-import { TseClient } from './tse.js?v=6';
-import { BrazilMap, RankingList, StateTable, formatInt } from './views.js?v=6';
+import { ELECTION, HOME_STATE, OFFICE, REFRESH_MS, STATES, TSE_BASE } from './config.js?v=7';
+import { LivePage } from './live-page.js?v=7';
+import { CandidatePalette } from './palette.js?v=7';
+import { TseClient } from './tse.js?v=7';
+import { BrazilMap, RankingList, StateTable, formatInt } from './views.js?v=7';
 
 const $ = id => document.getElementById(id);
 
