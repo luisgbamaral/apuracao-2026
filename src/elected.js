@@ -1,8 +1,8 @@
-import { ELECTED_PAGES, ELECTION, REFRESH_MS, STATES, TSE_BASE } from './config.js';
-import { LivePage } from './live-page.js';
-import { PartyPalette } from './palette.js';
-import { TseClient } from './tse.js';
-import { esc, formatInt, swatch } from './views.js';
+import { ELECTED_PAGES, ELECTION, REFRESH_MS, STATES, TSE_BASE } from './config.js?v=6';
+import { LivePage } from './live-page.js?v=6';
+import { PartyPalette } from './palette.js?v=6';
+import { TseClient } from './tse.js?v=6';
+import { esc, formatInt, swatch } from './views.js?v=6';
 
 const $ = id => document.getElementById(id);
 const PENDING = 'A definir';

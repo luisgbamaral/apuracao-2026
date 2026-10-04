@@ -53,3 +53,11 @@ Election and office codes live in `src/config.js` and come from the TSE's `ofici
 ## Data
 
 Results: [TSE](https://resultados.tse.jus.br). Boundaries: [IBGE](https://servicodados.ibge.gov.br/api/docs/malhas). Counts are partial until the TSE closes the tally. This project is not affiliated with the TSE.
+
+## Deploying
+
+GitHub Pages caches every file for 10 minutes, so a browser could mix old and new modules right after a deploy. Every stylesheet, script and import therefore carries a `?v=N` query; bump it in one go before publishing:
+
+```bash
+sed -i -E 's/\?v=[0-9]+/?v=7/' index.html eleitos.html src/*.js
+```

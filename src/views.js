@@ -1,5 +1,5 @@
-import { STATES } from './config.js';
-import { CandidatePalette } from './palette.js';
+import { STATES } from './config.js?v=6';
+import { CandidatePalette } from './palette.js?v=6';
 
 const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 export const esc = text => String(text).replace(/[&<>"']/g, ch => ESCAPES[ch]);
